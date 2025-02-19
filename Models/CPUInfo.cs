@@ -6,32 +6,35 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using LibreHardwareMonitor.Hardware;
 using HardwareTempMonitor.ViewModels;
+using System.Windows;
 
 namespace HardwareTempMonitor.Models
 {
-    class CPUInfo : INotifyPropertyChanged
+    class CPUInfo
     {
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public int GetCPUTemperature()
+        public float? GetCPUTemperature()
         {
             Computer _computer = new Computer();
+
+            if (_computer == null)
+                return 0;
+
             _computer.IsCpuEnabled = true;
             _computer.Open();
 
-            List<int> cpuTemps = new List<int>();
+            List<float?> cpuTemps = new List<float?>();
 
             foreach(Hardware hardwareItem in _computer.Hardware)
             {
                 hardwareItem.Update();
+
                 if (hardwareItem.HardwareType == HardwareType.Cpu)
                 {
                     foreach (ISensor sensor in hardwareItem.Sensors)
                     {
                         if(sensor.SensorType == SensorType.Temperature)
                         {
-                            cpuTemps.Add((int)sensor.Value);
+                            cpuTemps.Add(sensor.Value);
                         }
                     }
                 }
@@ -39,7 +42,7 @@ namespace HardwareTempMonitor.Models
             }
             _computer.Close();
 
-            int CPUTemperature = cpuTemps.Sum() / cpuTemps.Count;
+            float? CPUTemperature = cpuTemps.Sum() / cpuTemps.Count;
             return CPUTemperature;
         }
     }

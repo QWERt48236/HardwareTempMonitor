@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:HardwareTempMonitor.ViewModels" 
-        xmlns:local="clr-namespace:HardwareTempMonitor" 
+        xmlns:local="clr-namespace:HardwareTempMonitor.Views" 
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
@@ -12,6 +12,6 @@
         <vm:CPUVM/>
     </Window.DataContext>
     <Grid>
-        <TextBlock Text="{Binding Temperature, Mode=OneWay}" Margin="333,158,342,194" FontSize="20"></TextBlock>
+        <local:CPUControl/>
     </Grid>
 </Window>
