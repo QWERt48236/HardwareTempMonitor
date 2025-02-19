@@ -1,52 +1,36 @@
 ﻿using HardwareTempMonitor.Models;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OxyPlot.Wpf;
 using OxyPlot.Series;
-using System.Timers;
-using HardwareTempMonitor.Views;
 using OxyPlot;
 using OxyPlot.Axes;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace HardwareTempMonitor.ViewModels
 {
     public class CPUVM : INotifyPropertyChanged
     {
-        private float? _temperature;
+        private static DispatcherTimer _dispatcherTimer;
         private PlotModel _cpuTemperature = new PlotModel();
+        private CPUModel _cpuInfo = new();
 
-        private CPUInfo CPUInfo = new();
-        private static System.Timers.Timer _timer;
+        public CPUVM()
+        {
+            SetTimer();
 
-        //public float? Temperature 
-        //{
-        //    get
-        //    {
-        //        float? cputemp = CPUInfo.GetCPUTemperature();
+            CPUTemperature = new PlotModel();
+            CPUTemperature.Series.Add(new LineSeries());
+            CPUTemperature.InvalidatePlot(true);
+        }
 
-        //        if (cputemp != null)
-        //        {
-        //            return float.Round((float)cputemp, 2);
-        //        }
-        //        return 0;
-        //    }
-        //    set
-        //    {
-        //        _temperature = value;
-        //        OnPropertyChanged("Temperature");
-        //    }
-        //}
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public PlotModel CPUTemperature
         {
             get
             {
                 return _cpuTemperature;
             }
-
             set
             {
                 _cpuTemperature = value;
@@ -54,40 +38,34 @@ namespace HardwareTempMonitor.ViewModels
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public CPUVM()
-        {
-            SetTimer();
-        } 
-
-        private void SetTimer()
-        {
-            _timer = new System.Timers.Timer(3000);
-            _timer.Elapsed += BuildCPUTemperaturePlot;
-
-            _timer.AutoReset = true;
-            _timer.Enabled = true;
-        }
-
         protected virtual void OnPropertyChanged(string Name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Name));
         }
 
-        private void BuildCPUTemperaturePlot(object? s, ElapsedEventArgs e)
+        private void SetTimer()
         {
-            float? cputemp = CPUInfo.GetCPUTemperature();
+            _dispatcherTimer = new DispatcherTimer();
+            _dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
+            _dispatcherTimer.Tick += BuildCPUTemperaturePlot;
+            _dispatcherTimer.Start();
+        }
 
-            if (!CPUTemperature.Series.Any())
+        private void BuildCPUTemperaturePlot(object o, EventArgs e)
+        {
+            float? cpuTemp = _cpuInfo.GetCPUTemperature();
+
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                CPUTemperature.Series.Add(new LineSeries());
-            }
+                var lineSeries = CPUTemperature.Series.FirstOrDefault() as LineSeries;
 
-            var lineSeries = CPUTemperature.Series.First() as LineSeries;
-            lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)cputemp));
+                if (lineSeries != null)
+                {
+                    lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)cpuTemp));
 
-            CPUTemperature.InvalidatePlot(true);
+                    CPUTemperature.InvalidatePlot(true);
+                }
+            });
         }
     }
 }
