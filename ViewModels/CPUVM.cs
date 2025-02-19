@@ -17,10 +17,7 @@ namespace HardwareTempMonitor.ViewModels
         public CPUVM()
         {
             SetTimer();
-
-            CPUTemperature = new PlotModel();
-            CPUTemperature.Series.Add(new LineSeries());
-            CPUTemperature.InvalidatePlot(true);
+            InitializePlot();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -66,6 +63,27 @@ namespace HardwareTempMonitor.ViewModels
                     CPUTemperature.InvalidatePlot(true);
                 }
             });
+        }
+
+        private void InitializePlot()
+        {
+            CPUTemperature = new PlotModel();
+            CPUTemperature.Series.Add(new LineSeries());
+
+            CPUTemperature.Subtitle = "CPU temperature";
+
+            CPUTemperature.Axes.Add(new DateTimeAxis
+            {
+                Position = AxisPosition.Bottom,
+                Title = "Time",
+            });
+            CPUTemperature.Axes.Add(new LinearAxis
+            {
+                Position = AxisPosition.Left,
+                Title = "Temperature °C",
+            });
+
+            CPUTemperature.InvalidatePlot(true);
         }
     }
 }
