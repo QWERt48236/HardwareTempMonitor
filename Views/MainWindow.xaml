@@ -12,6 +12,6 @@
         <vm:CPUVM/>
     </Window.DataContext>
     <Grid>
-        <local:CPUControl/>
+        <!--<local:CPUControl/>-->
     </Grid>
 </Window>

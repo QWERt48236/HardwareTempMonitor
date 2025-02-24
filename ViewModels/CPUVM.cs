@@ -11,6 +11,7 @@ namespace HardwareTempMonitor.ViewModels
     public class CPUVM : INotifyPropertyChanged
     {
         private static DispatcherTimer _dispatcherTimer;
+
         private PlotModel _cpuTemperature = new PlotModel();
         private CPUModel _cpuInfo = new();
 
@@ -20,7 +21,7 @@ namespace HardwareTempMonitor.ViewModels
             InitializePlot();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public PlotModel CPUTemperature
         {
@@ -48,21 +49,18 @@ namespace HardwareTempMonitor.ViewModels
             _dispatcherTimer.Start();
         }
 
-        private void BuildCPUTemperaturePlot(object o, EventArgs e)
+        private void BuildCPUTemperaturePlot(object? o, EventArgs e)
         {
-            float? cpuTemp = _cpuInfo.GetCPUTemperature();
+            float cpuTemp = _cpuInfo.GetCPUTemperature();
 
-            Application.Current.Dispatcher.Invoke(() =>
+            var lineSeries = CPUTemperature.Series.FirstOrDefault() as LineSeries;
+
+            if (lineSeries != null)
             {
-                var lineSeries = CPUTemperature.Series.FirstOrDefault() as LineSeries;
+                lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)cpuTemp));
 
-                if (lineSeries != null)
-                {
-                    lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)cpuTemp));
-
-                    CPUTemperature.InvalidatePlot(true);
-                }
-            });
+                CPUTemperature.InvalidatePlot(true);
+            }
         }
 
         private void InitializePlot()

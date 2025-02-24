@@ -3,20 +3,18 @@ using LibreHardwareMonitor.Hardware;
 
 namespace HardwareTempMonitor.Models
 {
-    class CPUModel: INotifyPropertyChanged
+    class CPUModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public float? GetCPUTemperature()
+        public float GetCPUTemperature()
         {
-            Computer _computer = new Computer();
+            Computer computer = new Computer();
 
-            _computer.IsCpuEnabled = true;
-            _computer.Open();
+            computer.IsCpuEnabled = true;
+            computer.Open();
 
             List<float?> cpuTemps = new List<float?>();
 
-            foreach (Hardware hardwareItem in _computer.Hardware)
+            foreach (Hardware hardwareItem in computer.Hardware)
             {
                 hardwareItem.Update();
 
@@ -31,9 +29,10 @@ namespace HardwareTempMonitor.Models
                     }
                 }
             }
-            _computer.Close();
 
-            return cpuTemps.Sum() / cpuTemps.Count;
+            computer.Close();
+
+            return (cpuTemps.Sum() / cpuTemps.Count) == null ? 0 : (float)(cpuTemps.Sum() / cpuTemps.Count);
         }
     }
 }
