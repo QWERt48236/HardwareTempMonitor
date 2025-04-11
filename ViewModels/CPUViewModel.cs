@@ -8,14 +8,15 @@ using System.Windows.Threading;
 
 namespace HardwareTempMonitor.ViewModels
 {
-    public class CPUVM : INotifyPropertyChanged
+    public class CPUViewModel : INotifyPropertyChanged
     {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
         private static DispatcherTimer _dispatcherTimer;
-
+#pragma warning restore CS8618 // It is containing a non-null value when exiting constructor.
         private PlotModel _cpuTemperature = new PlotModel();
-        private CPUModel _cpuInfo = new();
+        private MotherboardModel _cpuInfo = new();
 
-        public CPUVM()
+        public CPUViewModel()
         {
             SetTimer();
             InitializePlot();
@@ -51,7 +52,7 @@ namespace HardwareTempMonitor.ViewModels
 
         private void BuildCPUTemperaturePlot(object? o, EventArgs e)
         {
-            float cpuTemp = _cpuInfo.GetCPUTemperature();
+            float cpuTemp = _cpuInfo.GetMotherboardTemperature();
 
             var lineSeries = CPUTemperature.Series.FirstOrDefault() as LineSeries;
 

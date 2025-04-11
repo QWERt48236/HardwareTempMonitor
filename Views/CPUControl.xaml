@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.DataContext>
-        <vm:CPUVM/>
+        <vm:CPUViewModel/>
     </UserControl.DataContext>
     <Grid>
         <oxy:PlotView Model="{Binding CPUTemperature}"/>
