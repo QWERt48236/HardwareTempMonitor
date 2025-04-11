@@ -14,7 +14,7 @@ namespace HardwareTempMonitor.ViewModels
         private static DispatcherTimer _dispatcherTimer;
 #pragma warning restore CS8618 // It is containing a non-null value when exiting constructor.
         private PlotModel _cpuTemperature = new PlotModel();
-        private MotherboardModel _cpuInfo = new();
+        private CPUModel _cpuInfo = new();
 
         public CPUViewModel()
         {
@@ -52,7 +52,7 @@ namespace HardwareTempMonitor.ViewModels
 
         private void BuildCPUTemperaturePlot(object? o, EventArgs e)
         {
-            float cpuTemp = _cpuInfo.GetMotherboardTemperature();
+            float cpuTemp = _cpuInfo.GetCPUTemperature();
 
             var lineSeries = CPUTemperature.Series.FirstOrDefault() as LineSeries;
 
