@@ -12,6 +12,7 @@
         <vm:CPUViewModel/>
     </UserControl.DataContext>
     <Grid>
-        <oxy:PlotView Model="{Binding CPUTemperature}"/>
+        <oxy:PlotView Visibility="{Binding TemperatureVisibility}" Model="{Binding CPUTemperaturePlot}"></oxy:PlotView>
+        <oxy:PlotView Visibility="{Binding LoadVisibility}" Model="{Binding CPULoadPlot}"></oxy:PlotView>
     </Grid>
 </UserControl>

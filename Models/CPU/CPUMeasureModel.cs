@@ -3,12 +3,10 @@ using LibreHardwareMonitor.Hardware;
 
 namespace HardwareTempMonitor.Models
 {
-    class CPUModel
+    class CPUMeasureModel
     {
-        public float GetCPUTemperature()
+        public float GetCPUTemperature(Computer computer)
         {
-            Computer computer = new Computer();
-
             computer.IsCpuEnabled = true;
             computer.Open();
 
@@ -35,10 +33,8 @@ namespace HardwareTempMonitor.Models
             return (cpuTemps.Sum() / cpuTemps.Count) == null ? 0 : (float)(cpuTemps.Sum() / cpuTemps.Count);
         }
 
-        public float GetCPULoad()
+        public float GetCPULoad(Computer computer)
         {
-            Computer computer = new Computer();
-
             computer.IsCpuEnabled = true;
             computer.Open();
 

@@ -21,8 +21,8 @@
         <StackPanel>
             <Expander Header="CPU" Margin="10, 15">
                 <StackPanel>
-                    <Button Margin="10">Temperature</Button>
-                    <Button Margin="10">Load</Button>
+                    <Button Margin="10" Command="{Binding CPUTemperatureCommand}">Temperature</Button>
+                    <Button Margin="10" Command="{Binding CPULoadCommand}">Load</Button>
                 </StackPanel>
             </Expander>
 

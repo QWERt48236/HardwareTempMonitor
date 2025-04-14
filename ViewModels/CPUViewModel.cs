@@ -5,26 +5,81 @@ using OxyPlot;
 using OxyPlot.Axes;
 using System.Windows;
 using System.Windows.Threading;
+using HardwareTempMonitor.Commands;
+using System.Windows.Input;
 
 namespace HardwareTempMonitor.ViewModels
 {
     public class CPUViewModel : INotifyPropertyChanged
     {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. 
-        private static DispatcherTimer _dispatcherTimer;
-#pragma warning restore CS8618 // It is containing a non-null value when exiting constructor.
+        public Visibility _temperatureVisibility;
+        public Visibility _loadVisibility;
+
+        public ICommand CPUTemperatureCommand { get; }
+        public ICommand CPULoadCommand { get; }
+
+        private void ShowCPUTemperature(object obj)
+        {
+            TemperatureVisibility = Visibility.Visible;
+            LoadVisibility = Visibility.Collapsed;
+        }
+
+        public void ShowCPULoad(object obj)
+        {
+            TemperatureVisibility = Visibility.Collapsed;
+            LoadVisibility = Visibility.Visible;
+        }
+
+        public Visibility TemperatureVisibility
+        {
+            get
+            {
+                return _temperatureVisibility;
+            }
+            set
+            {
+                _temperatureVisibility = value;
+                OnPropertyChanged("TemperatureVisibility");
+            }
+        }
+
+        public Visibility LoadVisibility
+        {
+            get
+            {
+                return _loadVisibility;
+            }
+            set
+            {
+                _loadVisibility = value;
+                OnPropertyChanged("LoadVisibility");
+            }
+        }
+
         private PlotModel _cpuTemperature = new PlotModel();
-        private CPUModel _cpuInfo = new();
+        private PlotModel _cpuLoad = new PlotModel();
+
+        private DateTime startTime = DateTime.Now;
 
         public CPUViewModel()
         {
-            SetTimer();
-            InitializePlot();
+            InitializeTemperaturePlot();
+            InitializeLoadPlot();
+
+            LoadVisibility = Visibility.Collapsed;
+            TemperatureVisibility = Visibility.Collapsed;
+
+
+            MainMonitoringModel.OnMonitoringDataUpdate += BuildCPUTemperaturePlot;
+            MainMonitoringModel.OnMonitoringDataUpdate += BuildCPULoadPlot;
+
+            CPUTemperatureCommand = new RelayCommand(ShowCPUTemperature);
+            CPULoadCommand = new RelayCommand(ShowCPULoad);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public PlotModel CPUTemperature
+        public PlotModel CPUTemperaturePlot
         {
             get
             {
@@ -33,7 +88,20 @@ namespace HardwareTempMonitor.ViewModels
             set
             {
                 _cpuTemperature = value;
-                OnPropertyChanged("CPUTemperature");
+                OnPropertyChanged("CPUTemperaturePlot");
+            }
+        }
+
+        public PlotModel CPULoadPlot
+        {
+            get
+            {
+                return _cpuLoad;
+            }
+            set
+            {
+                _cpuLoad = value;
+                OnPropertyChanged("CPULoadPlot");
             }
         }
 
@@ -42,47 +110,148 @@ namespace HardwareTempMonitor.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Name));
         }
 
-        private void SetTimer()
+        private void BuildCPUTemperaturePlot(LinkedList<MonitoringDataModel> monitoringDataModels)
         {
-            _dispatcherTimer = new DispatcherTimer();
-            _dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
-            _dispatcherTimer.Tick += BuildCPUTemperaturePlot;
-            _dispatcherTimer.Start();
+            float cpuTemp = monitoringDataModels.Last().CPU.Temperature;
+
+            Application.Current.Dispatcher.Invoke(new Action(() => {
+
+                var lineSeries = CPUTemperaturePlot.Series.FirstOrDefault() as LineSeries;
+
+                if (lineSeries == null)
+                    return;
+
+                if (lineSeries.Points.Count <= 120)
+                {
+                    lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)cpuTemp));
+
+                    CPUTemperaturePlot.InvalidatePlot(true);
+                }
+                else
+                {
+                    lineSeries.Points.Remove(lineSeries.Points.First());
+                    lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)cpuTemp));
+
+                    CPUTemperaturePlot.InvalidatePlot(true);
+                }
+            }));
         }
 
-        private void BuildCPUTemperaturePlot(object? o, EventArgs e)
+        private void BuildCPULoadPlot(LinkedList<MonitoringDataModel> monitoringDataModels)
         {
-            float cpuTemp = _cpuInfo.GetCPUTemperature();
+            int cpuLoad = (int)(monitoringDataModels.Last().CPU.Load*100);
 
-            var lineSeries = CPUTemperature.Series.FirstOrDefault() as LineSeries;
+            Application.Current.Dispatcher.Invoke(new Action(() => {
 
-            if (lineSeries != null)
+                var lineSeries = CPULoadPlot.Series.FirstOrDefault() as LineSeries;
+
+                if (lineSeries == null)
+                    return;
+
+                if (lineSeries.Points.Count <= 120)
+                {
+                    lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), cpuLoad));
+
+                    CPULoadPlot.InvalidatePlot(true);
+                }
+                else
+                {
+                    lineSeries.Points.Remove(lineSeries.Points.First());
+                    lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), cpuLoad));
+
+                    CPULoadPlot.InvalidatePlot(true);
+                }
+            }));
+        }
+
+        private void InitializeTemperaturePlot()
+        {
+            CPUTemperaturePlot = new PlotModel();
+            CPUTemperaturePlot.Series.Add(new LineSeries()
             {
-                lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)cpuTemp));
+                StrokeThickness = 2,
+                Color = OxyColors.Crimson
+            });
 
-                CPUTemperature.InvalidatePlot(true);
-            }
-        }
+            CPUTemperaturePlot.Subtitle = "CPU temperature";
 
-        private void InitializePlot()
-        {
-            CPUTemperature = new PlotModel();
-            CPUTemperature.Series.Add(new LineSeries());
-
-            CPUTemperature.Subtitle = "CPU temperature";
-
-            CPUTemperature.Axes.Add(new DateTimeAxis
+            CPUTemperaturePlot.Axes.Add(new DateTimeAxis
             {
                 Position = AxisPosition.Bottom,
                 Title = "Time",
+                LabelFormatter = val =>
+                {
+                    var span = DateTimeAxis.ToDateTime(val) - startTime;
+                    return span.TotalMinutes < 1
+                        ? $"+{span.Seconds}s"
+                        : $"+{span.Minutes}m {span.Seconds}s"; 
+                },
+                IntervalType = DateTimeIntervalType.Seconds,
+                MajorGridlineStyle = LineStyle.Solid,
+                MinorGridlineStyle = LineStyle.Dot,
+                MajorGridlineColor = OxyColors.LightGray,
+                MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
+                MajorGridlineThickness = 1,
+                MinorGridlineThickness = 0.5
             });
-            CPUTemperature.Axes.Add(new LinearAxis
+            CPUTemperaturePlot.Axes.Add(new LinearAxis
             {
                 Position = AxisPosition.Left,
                 Title = "Temperature °C",
+                MajorGridlineStyle = LineStyle.Solid,
+                MinorGridlineStyle = LineStyle.Dot,
+                MajorGridlineColor = OxyColors.LightGray,
+                MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
+                MajorGridlineThickness = 1,
+                MinorGridlineThickness = 0.5
             });
 
-            CPUTemperature.InvalidatePlot(true);
+            CPUTemperaturePlot.InvalidatePlot(true);
+        }
+
+        private void InitializeLoadPlot()
+        {
+            CPULoadPlot = new PlotModel();
+            CPULoadPlot.Series.Add(new LineSeries()
+            {
+                StrokeThickness = 2,
+                Color = OxyColors.Aquamarine
+            });
+
+            CPULoadPlot.Subtitle = "CPU load";
+
+            CPULoadPlot.Axes.Add(new DateTimeAxis
+            {
+                Position = AxisPosition.Bottom,
+                Title = "Time",
+                LabelFormatter = val =>
+                {
+                    var span = DateTimeAxis.ToDateTime(val) - startTime;
+                    return span.TotalMinutes < 1
+                        ? $"+{span.Seconds}s"
+                        : $"+{span.Minutes}m {span.Seconds}s";
+                },
+                IntervalType = DateTimeIntervalType.Seconds,
+                MajorGridlineStyle = LineStyle.Solid,
+                MinorGridlineStyle = LineStyle.Dot,
+                MajorGridlineColor = OxyColors.LightGray,
+                MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
+                MajorGridlineThickness = 1,
+                MinorGridlineThickness = 0.5
+            });
+            CPULoadPlot.Axes.Add(new LinearAxis
+            {
+                Position = AxisPosition.Left,
+                Title = "Load %",
+                MajorGridlineStyle = LineStyle.Solid,
+                MinorGridlineStyle = LineStyle.Dot,
+                MajorGridlineColor = OxyColors.LightGray,
+                MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
+                MajorGridlineThickness = 1,
+                MinorGridlineThickness = 0.5
+            });
+
+            CPULoadPlot.InvalidatePlot(true);
         }
     }
 }

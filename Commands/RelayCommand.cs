@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace HardwareTempMonitor.Commands
 {
-    class RelayCommand
+    class RelayCommand : ICommand
     {
         private readonly Action<object> _execute;
         private readonly Func<object, bool> _canExecute;

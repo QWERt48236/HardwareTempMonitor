@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HardwareTempMonitor.Models
 {
-    class MotherboardModel
+    class NetworkModel
     {
         public float GetMotherboardTemperature()
         {
@@ -30,7 +30,7 @@ namespace HardwareTempMonitor.Models
             {
                 hardwareItem.Update();
 
-                if (hardwareItem.HardwareType == HardwareType.Motherboard)
+                if (hardwareItem.HardwareType == HardwareType.Network)
                 {
                     foreach (ISensor sensor in hardwareItem.Sensors)
                     {
