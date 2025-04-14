@@ -139,7 +139,7 @@ namespace HardwareTempMonitor.ViewModels
 
         private void BuildCPULoadPlot(LinkedList<MonitoringDataModel> monitoringDataModels)
         {
-            int cpuLoad = (int)(monitoringDataModels.Last().CPU.Load*100);
+            int cpuLoad = (int)(monitoringDataModels.Last().CPU.Load);
 
             Application.Current.Dispatcher.Invoke(new Action(() => {
 
