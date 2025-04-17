@@ -23,7 +23,7 @@
                 </StackPanel>
             </Expander>
 
-            <Expander Header="MotherBoard" Margin="10">
+            <Expander Header="Network" Margin="10">
                 <StackPanel>
                     <Button Margin="10">Temperature</Button>
                     <Button Margin="10">Load</Button>

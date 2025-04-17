@@ -7,10 +7,7 @@ namespace HardwareTempMonitor.Models
     {
         public float GetCPUTemperature(Computer computer)
         {
-            computer.IsCpuEnabled = true;
-            computer.Open();
-
-            List<float?> cpuTemps = new List<float?>();
+            float? cpuAverageValue = 0;
 
             foreach (Hardware hardwareItem in computer.Hardware)
             {
@@ -18,27 +15,18 @@ namespace HardwareTempMonitor.Models
 
                 if (hardwareItem.HardwareType == HardwareType.Cpu)
                 {
-                    foreach (ISensor sensor in hardwareItem.Sensors)
-                    {
-                        if (sensor.SensorType == SensorType.Temperature)
-                        {
-                            cpuTemps.Add(sensor.Value);
-                        }
-                    }
+                    cpuAverageValue = (from sencor in hardwareItem.Sensors
+                                               where sencor.Name.Contains("CPU Core") && !sencor.Name.Contains("Distance to TjMax") && sencor.SensorType == SensorType.Temperature
+                                               select sencor.Value).Average();
                 }
             }
 
-            computer.Close();
-
-            return (cpuTemps.Sum() / cpuTemps.Count) == null ? 0 : (float)(cpuTemps.Sum() / cpuTemps.Count);
+            return cpuAverageValue == null ? 0 : (float)cpuAverageValue;
         }
 
         public float GetCPULoad(Computer computer)
         {
-            computer.IsCpuEnabled = true;
-            computer.Open();
-
-            List<float?> cpuLoads = new List<float?>();
+            float? cpuAverageValue = 0;
 
             foreach (Hardware hardwareItem in computer.Hardware)
             {
@@ -46,19 +34,13 @@ namespace HardwareTempMonitor.Models
 
                 if (hardwareItem.HardwareType == HardwareType.Cpu)
                 {
-                    foreach (ISensor sensor in hardwareItem.Sensors)
-                    {
-                        if (sensor.SensorType == SensorType.Load)
-                        {
-                            cpuLoads.Add(sensor.Value);
-                        }
-                    }
+                    cpuAverageValue = (from sencor in hardwareItem.Sensors
+                                                where sencor.Name.Contains("CPU Core") && sencor.SensorType == SensorType.Load
+                                                select sencor.Value).Average();
                 }
             }
 
-            computer.Close();
-
-            return (cpuLoads.Sum() / cpuLoads.Count) == null ? 0 : (float)(cpuLoads.Sum() / cpuLoads.Count);
+            return cpuAverageValue == null ? 0 : (float)cpuAverageValue;
         }
     }
 }

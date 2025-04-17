@@ -1,4 +1,5 @@
 ﻿using HardwareTempMonitor.Models.CPU;
+using HardwareTempMonitor.Models.Network;
 using LibreHardwareMonitor.Hardware;
 using System;
 using System.Collections.Generic;
@@ -13,17 +14,17 @@ namespace HardwareTempMonitor.Models
     {
         public static LinkedList<MonitoringDataModel> MonitoringData { get; private set; }
 
-        public static event Action<LinkedList<MonitoringDataModel>>? OnMonitoringDataUpdate;
+        public static event Action<LinkedList<MonitoringDataModel>> OnMonitoringDataUpdate;
 
-        private static PeriodicTimer _periodicTimer;
-        private static CPUMeasureModel _cpuMeasureModel;
-        private static Computer _computer;
+        private static PeriodicTimer _periodicTimer = SetTimer();
+        private static Computer _computer = new Computer();
+
+        private static CPUMeasureModel _cpuMeasureModel = new CPUMeasureModel();
+        private static NetworkMeasureModel _networkMeasureModel = new NetworkMeasureModel();
 
         public static async Task StartMonitoring()
         {
             MonitoringData = new LinkedList<MonitoringDataModel>();
-            _periodicTimer = SetTimer();
-            _cpuMeasureModel = new CPUMeasureModel();
 
             while(await _periodicTimer.WaitForNextTickAsync())
             {
@@ -42,8 +43,12 @@ namespace HardwareTempMonitor.Models
 
         private static void MeasureData()
         {
-            _computer = new Computer();
-            _computer.IsCpuEnabled = true;
+            _computer = new Computer()
+            {
+                IsCpuEnabled = true,
+                IsNetworkEnabled = true
+            };
+
             _computer.Open();
 
             CPUDataModel CPUDataModel = new CPUDataModel()
@@ -52,14 +57,22 @@ namespace HardwareTempMonitor.Models
                 Load = _cpuMeasureModel.GetCPULoad(_computer)
             };
 
+            NetworkDataModel networkDataModel = new NetworkDataModel()
+            {
+                UploadSpeed = _networkMeasureModel.GetUploadSpeed(_computer),
+                DownloadSpeed = _networkMeasureModel.GetDownloadSpeed(_computer),
+            };
+
+            _computer.Close();
+
             MonitoringDataModel dataModel = new MonitoringDataModel()
             {
                 MeasureTime = DateTime.Now,
-                CPU = CPUDataModel
+                CPU = CPUDataModel,
+                Network = networkDataModel
             };
 
             MonitoringData.AddLast(dataModel);
-
         }
 
         private static async Task MeasureDataAsync()
