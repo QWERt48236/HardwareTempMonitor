@@ -15,19 +15,27 @@ namespace HardwareTempMonitor.ViewModels
         public Visibility _temperatureVisibility;
         public Visibility _loadVisibility;
 
-        public ICommand CPUTemperatureCommand { get; }
-        public ICommand CPULoadCommand { get; }
+        private PlotModel _cpuTemperature = new PlotModel();
+        private PlotModel _cpuLoad = new PlotModel();
 
-        private void ShowCPUTemperature(object obj)
+        private DateTime startTime = DateTime.Now;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public CPUViewModel()
         {
-            TemperatureVisibility = Visibility.Visible;
+            InitializeTemperaturePlot();
+            InitializeLoadPlot();
+
             LoadVisibility = Visibility.Collapsed;
-        }
-
-        public void ShowCPULoad(object obj)
-        {
             TemperatureVisibility = Visibility.Collapsed;
-            LoadVisibility = Visibility.Visible;
+
+
+            MainMonitoringModel.OnMonitoringDataUpdate += BuildCPUTemperaturePlot;
+            MainMonitoringModel.OnMonitoringDataUpdate += BuildCPULoadPlot;
+
+            CPUTemperatureCommand = new RelayCommand(ShowCPUTemperature);
+            CPULoadCommand = new RelayCommand(ShowCPULoad);
         }
 
         public Visibility TemperatureVisibility
@@ -56,29 +64,6 @@ namespace HardwareTempMonitor.ViewModels
             }
         }
 
-        private PlotModel _cpuTemperature = new PlotModel();
-        private PlotModel _cpuLoad = new PlotModel();
-
-        private DateTime startTime = DateTime.Now;
-
-        public CPUViewModel()
-        {
-            InitializeTemperaturePlot();
-            InitializeLoadPlot();
-
-            LoadVisibility = Visibility.Collapsed;
-            TemperatureVisibility = Visibility.Collapsed;
-
-
-            MainMonitoringModel.OnMonitoringDataUpdate += BuildCPUTemperaturePlot;
-            MainMonitoringModel.OnMonitoringDataUpdate += BuildCPULoadPlot;
-
-            CPUTemperatureCommand = new RelayCommand(ShowCPUTemperature);
-            CPULoadCommand = new RelayCommand(ShowCPULoad);
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         public PlotModel CPUTemperaturePlot
         {
             get
@@ -105,11 +90,25 @@ namespace HardwareTempMonitor.ViewModels
             }
         }
 
+        public ICommand CPUTemperatureCommand { get; }
+        public ICommand CPULoadCommand { get; }
+
         protected virtual void OnPropertyChanged(string Name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Name));
         }
 
+        private void ShowCPUTemperature(object obj)
+        {
+            TemperatureVisibility = Visibility.Visible;
+            LoadVisibility = Visibility.Collapsed;
+        }
+
+        private void ShowCPULoad(object obj)
+        {
+            TemperatureVisibility = Visibility.Collapsed;
+            LoadVisibility = Visibility.Visible;
+        }
         private void BuildCPUTemperaturePlot(LinkedList<MonitoringDataModel> monitoringDataModels)
         {
             float cpuTemp = monitoringDataModels.Last().CPU.Temperature;
