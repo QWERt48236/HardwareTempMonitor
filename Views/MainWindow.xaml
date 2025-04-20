@@ -39,6 +39,7 @@
             
         </StackPanel>
 
-        <local:CPUControl x:Name="CpuControl" Grid.Column="1"/>
+        <!--<local:CPUControl x:Name="CpuControl" Grid.Column="1"/>-->
+        <local:NetworkControl x:Name="NetworkControl" Grid.Column="1"/>
     </Grid>
 </Window>

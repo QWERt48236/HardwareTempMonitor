@@ -4,9 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:HardwareTempMonitor.Views"
+             xmlns:vm="clr-namespace:HardwareTempMonitor.ViewModels" 
+             xmlns:oxy="http://oxyplot.org/wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.DataContext>
+        <vm:NetworkViewModel/>
+    </UserControl.DataContext>
     <Grid>
-            
+        <oxy:PlotView Visibility="{Binding Visibility}" Model="{Binding NetworkPlot}"></oxy:PlotView>
     </Grid>
 </UserControl>

@@ -28,9 +28,9 @@ namespace HardwareTempMonitor.ViewModels
         {
             InitializePlot();
 
-            Visibility = Visibility.Collapsed;
+            Visibility = Visibility.Visible;
 
-            MainMonitoringModel.OnMonitoringDataUpdate += BuildCPUTemperaturePlot;
+            MainMonitoringModel.OnMonitoringDataUpdate += BuildNetworkPlot;
         }
 
         public Visibility Visibility
@@ -66,27 +66,33 @@ namespace HardwareTempMonitor.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Name));
         }
 
-        private void BuildCPUTemperaturePlot(LinkedList<MonitoringDataModel> monitoringDataModels)
+        private void BuildNetworkPlot(LinkedList<MonitoringDataModel> monitoringDataModels)
         {
-            float cpuTemp = monitoringDataModels.Last().CPU.Temperature;
+            float downlodSpeed = monitoringDataModels.Last().Network.DownloadSpeed;
+            float uploadSpeed = monitoringDataModels.Last().Network.UploadSpeed;
 
             Application.Current.Dispatcher.Invoke(new Action(() => {
 
-                var lineSeries = NetworkPlot.Series.FirstOrDefault() as LineSeries;
+                var downloadLineSeries = NetworkPlot.Series[0] as LineSeries;
+                var uploadLineSeries = NetworkPlot.Series[1] as LineSeries;
 
-                if (lineSeries == null)
+                if (downloadLineSeries == null || uploadLineSeries == null)
                     return;
 
-                if (lineSeries.Points.Count <= 120)
+                if (downloadLineSeries.Points.Count <= 120)
                 {
-                    lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)cpuTemp));
+                    downloadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)downlodSpeed));
+                    uploadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)uploadSpeed));
 
                     NetworkPlot.InvalidatePlot(true);
                 }
                 else
                 {
-                    lineSeries.Points.Remove(lineSeries.Points.First());
-                    lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)cpuTemp));
+                    downloadLineSeries.Points.Remove(downloadLineSeries.Points.First());
+                    uploadLineSeries.Points.Remove(uploadLineSeries.Points.First());
+
+                    downloadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)downlodSpeed));
+                    uploadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)uploadSpeed));
 
                     NetworkPlot.InvalidatePlot(true);
                 }
@@ -103,7 +109,13 @@ namespace HardwareTempMonitor.ViewModels
                 Color = OxyColors.Crimson
             });
 
-            NetworkPlot.Subtitle = "CPU temperature";
+            NetworkPlot.Series.Add(new LineSeries()
+            {
+                StrokeThickness = 2,
+                Color = OxyColors.DarkGreen
+            });
+
+            NetworkPlot.Subtitle = "Network";
 
             NetworkPlot.Axes.Add(new DateTimeAxis
             {
@@ -127,7 +139,18 @@ namespace HardwareTempMonitor.ViewModels
             NetworkPlot.Axes.Add(new LinearAxis
             {
                 Position = AxisPosition.Left,
-                Title = "Temperature °C",
+                Title = "Downlad Mb",
+                MajorGridlineStyle = LineStyle.Solid,
+                MinorGridlineStyle = LineStyle.Dot,
+                MajorGridlineColor = OxyColors.LightGray,
+                MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
+                MajorGridlineThickness = 1,
+                MinorGridlineThickness = 0.5
+            });
+            NetworkPlot.Axes.Add(new LinearAxis
+            {
+                Position = AxisPosition.Right,
+                Title = "Upload Mb",
                 MajorGridlineStyle = LineStyle.Solid,
                 MinorGridlineStyle = LineStyle.Dot,
                 MajorGridlineColor = OxyColors.LightGray,
