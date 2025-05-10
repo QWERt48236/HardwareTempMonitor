@@ -12,5 +12,25 @@ namespace HardwareTempMonitor.ViewModels
     class MainViewModel
     {
 
+
+        public MainViewModel()
+        {
+            CPUTemperatureCommand = new RelayCommand(ShowCPUTemperature);
+            CPULoadCommand = new RelayCommand(ShowCPULoad);
+        }
+
+        public ICommand CPUTemperatureCommand { get; }
+        public ICommand CPULoadCommand { get; }
+        public ICommand NetworkLoadCommand { get; }
+
+        private void ShowCPUTemperature(object obj)
+        {
+
+        }
+
+        private void ShowCPULoad(object obj)
+        {
+
+        }
     }
 }
