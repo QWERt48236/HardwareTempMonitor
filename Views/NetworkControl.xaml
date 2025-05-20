@@ -8,10 +8,7 @@
              xmlns:oxy="http://oxyplot.org/wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.DataContext>
-        <vm:NetworkViewModel/>
-    </UserControl.DataContext>
     <Grid>
-        <oxy:PlotView Visibility="{Binding Visibility}" Model="{Binding NetworkPlot}"></oxy:PlotView>
+        <oxy:PlotView Model="{Binding NetworkPlot}"></oxy:PlotView>
     </Grid>
 </UserControl>

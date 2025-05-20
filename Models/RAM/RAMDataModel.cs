@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HardwareTempMonitor.Models
+namespace HardwareTempMonitor.Models.RAM
 {
-    class RAMModel
+    internal class RAMDataModel
     {
     }
 }

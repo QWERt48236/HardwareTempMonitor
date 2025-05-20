@@ -8,8 +8,10 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <vm:MainViewModel></vm:MainViewModel>
+    </Window.DataContext>
     <Grid>
-        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="3*"></ColumnDefinition>
@@ -18,15 +20,14 @@
         <StackPanel>
             <Expander Header="CPU" Margin="10, 15">
                 <StackPanel>
-                    <Button Margin="10" Command="{Binding ElementName=CpuControl, Path=DataContext.CPUTemperatureCommand}">Temperature</Button>
-                    <Button Margin="10" Command="{Binding ElementName=CpuControl, Path=DataContext.CPULoadCommand}">Load</Button>
+                    <Button Margin="10" Command="{Binding CPUTemperatureCommand}">Temperature</Button>
+                    <Button Margin="10" Command="{Binding CPULoadCommand}">Load</Button>
                 </StackPanel>
             </Expander>
 
             <Expander Header="Network" Margin="10">
                 <StackPanel>
-                    <Button Margin="10">Temperature</Button>
-                    <Button Margin="10">Load</Button>
+                    <Button Margin="10" Command="{Binding NetworkLoadCommand}">Load</Button>
                 </StackPanel>
             </Expander>
 
@@ -39,9 +40,15 @@
             
         </StackPanel>
 
-        <ContentControl  x:Name="MainContent" Grid.Column="1"/>
+        <local:CPUControl 
+    Grid.Column="1"
+    DataContext="{Binding CPUViewModel}"
+    Visibility="{Binding DataContext.CPUVisibility, RelativeSource={RelativeSource AncestorType=Window}}" />
 
-        <local:CPUControl x:Name="CpuControl" Grid.Column="1"/>
-        <local:NetworkControl x:Name="NetworkControl" Grid.Column="1"/>
+        <local:NetworkControl 
+    Grid.Column="1"
+    DataContext="{Binding NetworkViewModel}"
+    Visibility="{Binding DataContext.NetworkVisibility, RelativeSource={RelativeSource AncestorType=Window}}" />
+
     </Grid>
 </Window>

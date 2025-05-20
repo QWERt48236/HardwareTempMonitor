@@ -98,13 +98,13 @@ namespace HardwareTempMonitor.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Name));
         }
 
-        private void ShowCPUTemperature(object obj)
+        public void ShowCPUTemperature(object obj)
         {
             TemperatureVisibility = Visibility.Visible;
             LoadVisibility = Visibility.Collapsed;
         }
 
-        private void ShowCPULoad(object obj)
+        public void ShowCPULoad(object obj)
         {
             TemperatureVisibility = Visibility.Collapsed;
             LoadVisibility = Visibility.Visible;
@@ -120,7 +120,7 @@ namespace HardwareTempMonitor.ViewModels
                 if (lineSeries == null)
                     return;
 
-                if (lineSeries.Points.Count <= 120)
+                if (lineSeries.Points.Count <= 30)
                 {
                     lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)cpuTemp));
 
@@ -147,7 +147,7 @@ namespace HardwareTempMonitor.ViewModels
                 if (lineSeries == null)
                     return;
 
-                if (lineSeries.Points.Count <= 120)
+                if (lineSeries.Points.Count <= 30)
                 {
                     lineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), cpuLoad));
 
@@ -251,6 +251,16 @@ namespace HardwareTempMonitor.ViewModels
             });
 
             CPULoadPlot.InvalidatePlot(true);
+
+            var temperatureLineSeries = CPUTemperaturePlot.Series.FirstOrDefault() as LineSeries;
+            var loadLineSeries = CPULoadPlot.Series.FirstOrDefault() as LineSeries;
+
+            for (int i = 0; i < 30; i++)
+            {
+                temperatureLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(startTime.AddSeconds(i)), double.NaN));
+                loadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(startTime.AddSeconds(i)), double.NaN));
+
+            }
         }
     }
 }

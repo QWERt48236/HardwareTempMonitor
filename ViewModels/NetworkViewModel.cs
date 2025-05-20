@@ -28,22 +28,7 @@ namespace HardwareTempMonitor.ViewModels
         {
             InitializePlot();
 
-            Visibility = Visibility.Visible;
-
             MainMonitoringModel.OnMonitoringDataUpdate += BuildNetworkPlot;
-        }
-
-        public Visibility Visibility
-        {
-            get
-            {
-                return _visibility;
-            }
-            set
-            {
-                _visibility = value;
-                OnPropertyChanged("Visibility");
-            }
         }
 
         public PlotModel NetworkPlot
@@ -79,7 +64,7 @@ namespace HardwareTempMonitor.ViewModels
                 if (downloadLineSeries == null || uploadLineSeries == null)
                     return;
 
-                if (downloadLineSeries.Points.Count <= 120)
+                if (downloadLineSeries.Points.Count <= 30)
                 {
                     downloadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)downlodSpeed));
                     uploadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(DateTime.Now), (double)uploadSpeed));
@@ -160,6 +145,15 @@ namespace HardwareTempMonitor.ViewModels
             });
 
             NetworkPlot.InvalidatePlot(true);
+
+            var downloadLineSeries = NetworkPlot.Series[0] as LineSeries;
+            var uploadLineSeries = NetworkPlot.Series[1] as LineSeries;
+
+            for(int i = 0; i < 30; i++)
+            {
+                downloadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(startTime.AddSeconds(i)), double.NaN));
+                uploadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(startTime.AddSeconds(i)), double.NaN));
+            }
         }
     }
 }

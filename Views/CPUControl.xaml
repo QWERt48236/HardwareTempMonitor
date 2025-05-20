@@ -8,11 +8,9 @@
              xmlns:oxy="http://oxyplot.org/wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.DataContext>
-        <vm:CPUViewModel/>
-    </UserControl.DataContext>
     <Grid>
-        <oxy:PlotView Visibility="{Binding TemperatureVisibility}" Model="{Binding CPUTemperaturePlot}"></oxy:PlotView>
+        <oxy:PlotView 
+            Visibility="{Binding TemperatureVisibility}" Model="{Binding CPUTemperaturePlot}"></oxy:PlotView>
         <oxy:PlotView Visibility="{Binding LoadVisibility}" Model="{Binding CPULoadPlot}"></oxy:PlotView>
     </Grid>
 </UserControl>
