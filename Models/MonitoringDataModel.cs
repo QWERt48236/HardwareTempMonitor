@@ -1,5 +1,6 @@
 ﻿using HardwareTempMonitor.Models.CPU;
 using HardwareTempMonitor.Models.Network;
+using HardwareTempMonitor.Models.RAM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,7 @@ namespace HardwareTempMonitor.Models
         public CPUDataModel CPU { get; set; }
 
         public NetworkDataModel Network { get; set; }
+
+        public RAMDataModel RAM { get; set; }
     }
 }

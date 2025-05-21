@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace HardwareTempMonitor.Models.RAM
 {
-    internal class RAMDataModel
+    internal struct RAMDataModel
     {
+        public float MemoryUsed { get; set; }
+        public float MemoryAvailable { get; set; }
     }
 }

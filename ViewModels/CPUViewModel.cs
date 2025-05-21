@@ -30,7 +30,6 @@ namespace HardwareTempMonitor.ViewModels
             LoadVisibility = Visibility.Collapsed;
             TemperatureVisibility = Visibility.Collapsed;
 
-
             MainMonitoringModel.OnMonitoringDataUpdate += BuildCPUTemperaturePlot;
             MainMonitoringModel.OnMonitoringDataUpdate += BuildCPULoadPlot;
 
@@ -109,6 +108,7 @@ namespace HardwareTempMonitor.ViewModels
             TemperatureVisibility = Visibility.Collapsed;
             LoadVisibility = Visibility.Visible;
         }
+
         private void BuildCPUTemperaturePlot(LinkedList<MonitoringDataModel> monitoringDataModels)
         {
             float cpuTemp = monitoringDataModels.Last().CPU.Temperature;
@@ -138,7 +138,7 @@ namespace HardwareTempMonitor.ViewModels
 
         private void BuildCPULoadPlot(LinkedList<MonitoringDataModel> monitoringDataModels)
         {
-            int cpuLoad = (int)(monitoringDataModels.Last().CPU.Load);
+            float cpuLoad = monitoringDataModels.Last().CPU.Load;
 
             Application.Current.Dispatcher.Invoke(new Action(() => {
 
@@ -177,7 +177,6 @@ namespace HardwareTempMonitor.ViewModels
             CPUTemperaturePlot.Axes.Add(new DateTimeAxis
             {
                 Position = AxisPosition.Bottom,
-                Title = "Time",
                 LabelFormatter = val =>
                 {
                     var span = DateTimeAxis.ToDateTime(val) - startTime;
@@ -202,7 +201,8 @@ namespace HardwareTempMonitor.ViewModels
                 MajorGridlineColor = OxyColors.LightGray,
                 MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
                 MajorGridlineThickness = 1,
-                MinorGridlineThickness = 0.5
+                MinorGridlineThickness = 0.5,
+                Minimum = 0
             });
 
             CPUTemperaturePlot.InvalidatePlot(true);
@@ -222,13 +222,12 @@ namespace HardwareTempMonitor.ViewModels
             CPULoadPlot.Axes.Add(new DateTimeAxis
             {
                 Position = AxisPosition.Bottom,
-                Title = "Time",
                 LabelFormatter = val =>
                 {
                     var span = DateTimeAxis.ToDateTime(val) - startTime;
                     return span.TotalMinutes < 1
-                        ? $"+{span.Seconds}s"
-                        : $"+{span.Minutes}m {span.Seconds}s";
+                        ? $"{span.Seconds}s"
+                        : $"{span.Minutes}m {span.Seconds}s";
                 },
                 IntervalType = DateTimeIntervalType.Seconds,
                 MajorGridlineStyle = LineStyle.Solid,
@@ -247,7 +246,8 @@ namespace HardwareTempMonitor.ViewModels
                 MajorGridlineColor = OxyColors.LightGray,
                 MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
                 MajorGridlineThickness = 1,
-                MinorGridlineThickness = 0.5
+                MinorGridlineThickness = 0.5,
+                Minimum = 0
             });
 
             CPULoadPlot.InvalidatePlot(true);
@@ -255,10 +255,10 @@ namespace HardwareTempMonitor.ViewModels
             var temperatureLineSeries = CPUTemperaturePlot.Series.FirstOrDefault() as LineSeries;
             var loadLineSeries = CPULoadPlot.Series.FirstOrDefault() as LineSeries;
 
-            for (int i = 0; i < 30; i++)
+            for (int i = 30; i > 0; i--)
             {
-                temperatureLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(startTime.AddSeconds(i)), double.NaN));
-                loadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(startTime.AddSeconds(i)), double.NaN));
+                temperatureLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(startTime.Subtract(TimeSpan.FromSeconds(i))), 0));
+                loadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(startTime.Subtract(TimeSpan.FromSeconds(i))), 0));
 
             }
         }

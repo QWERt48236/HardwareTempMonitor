@@ -1,5 +1,6 @@
 ﻿using HardwareTempMonitor.Models.CPU;
 using HardwareTempMonitor.Models.Network;
+using HardwareTempMonitor.Models.RAM;
 using LibreHardwareMonitor.Hardware;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace HardwareTempMonitor.Models
 
         private static CPUMeasureModel _cpuMeasureModel = new CPUMeasureModel();
         private static NetworkMeasureModel _networkMeasureModel = new NetworkMeasureModel();
+        private static RAMMeasureModel _ramMeasureModel = new RAMMeasureModel();
 
         public static async Task StartMonitoring()
         {
@@ -46,7 +48,8 @@ namespace HardwareTempMonitor.Models
             _computer = new Computer()
             {
                 IsCpuEnabled = true,
-                IsNetworkEnabled = true
+                IsNetworkEnabled = true,
+                IsMemoryEnabled = true
             };
 
             _computer.Open();
@@ -63,13 +66,20 @@ namespace HardwareTempMonitor.Models
                 DownloadSpeed = _networkMeasureModel.GetDownloadSpeed(_computer),
             };
 
+            RAMDataModel rAMDataModel = new RAMDataModel()
+            {
+                MemoryUsed = _ramMeasureModel.GetMemoryUsed(_computer),
+                MemoryAvailable = _ramMeasureModel.GetMemoryAvailable(_computer)
+            };
+
             _computer.Close();
 
             MonitoringDataModel dataModel = new MonitoringDataModel()
             {
                 MeasureTime = DateTime.Now,
                 CPU = CPUDataModel,
-                Network = networkDataModel
+                Network = networkDataModel,
+                RAM = rAMDataModel
             };
 
             MonitoringData.AddLast(dataModel);

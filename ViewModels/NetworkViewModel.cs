@@ -16,8 +16,6 @@ namespace HardwareTempMonitor.ViewModels
 {
     class NetworkViewModel: INotifyPropertyChanged
     {
-        public Visibility _visibility;
-
         private PlotModel _network = new PlotModel();
 
         private DateTime startTime = DateTime.Now;
@@ -53,8 +51,8 @@ namespace HardwareTempMonitor.ViewModels
 
         private void BuildNetworkPlot(LinkedList<MonitoringDataModel> monitoringDataModels)
         {
-            float downlodSpeed = monitoringDataModels.Last().Network.DownloadSpeed;
-            float uploadSpeed = monitoringDataModels.Last().Network.UploadSpeed;
+            float downlodSpeed = monitoringDataModels.Last().Network.DownloadSpeed / 1000_000;
+            float uploadSpeed = monitoringDataModels.Last().Network.UploadSpeed / 1000_000;
 
             Application.Current.Dispatcher.Invoke(new Action(() => {
 
@@ -105,7 +103,6 @@ namespace HardwareTempMonitor.ViewModels
             NetworkPlot.Axes.Add(new DateTimeAxis
             {
                 Position = AxisPosition.Bottom,
-                Title = "Time",
                 LabelFormatter = val =>
                 {
                     var span = DateTimeAxis.ToDateTime(val) - startTime;
@@ -130,7 +127,8 @@ namespace HardwareTempMonitor.ViewModels
                 MajorGridlineColor = OxyColors.LightGray,
                 MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
                 MajorGridlineThickness = 1,
-                MinorGridlineThickness = 0.5
+                MinorGridlineThickness = 0.5,
+                Minimum = 0
             });
             NetworkPlot.Axes.Add(new LinearAxis
             {
@@ -141,7 +139,8 @@ namespace HardwareTempMonitor.ViewModels
                 MajorGridlineColor = OxyColors.LightGray,
                 MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
                 MajorGridlineThickness = 1,
-                MinorGridlineThickness = 0.5
+                MinorGridlineThickness = 0.5,
+                Minimum = 0
             });
 
             NetworkPlot.InvalidatePlot(true);
@@ -149,10 +148,10 @@ namespace HardwareTempMonitor.ViewModels
             var downloadLineSeries = NetworkPlot.Series[0] as LineSeries;
             var uploadLineSeries = NetworkPlot.Series[1] as LineSeries;
 
-            for(int i = 0; i < 30; i++)
+            for(int i = 30; i > 0; i--)
             {
-                downloadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(startTime.AddSeconds(i)), double.NaN));
-                uploadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(startTime.AddSeconds(i)), double.NaN));
+                downloadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(startTime.Subtract(TimeSpan.FromSeconds(i))), 0));
+                uploadLineSeries.Points.Add(new DataPoint(DateTimeAxis.ToDouble(startTime.Subtract(TimeSpan.FromSeconds(i))), 0));
             }
         }
     }
