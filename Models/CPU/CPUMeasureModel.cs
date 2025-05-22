@@ -42,5 +42,27 @@ namespace HardwareTempMonitor.Models
 
             return cpuAverageValue == null ? 0 : (float)cpuAverageValue;
         }
+
+        public string GetCPUCharacteristics(Computer computer)
+        {
+            string name = string.Empty;
+            string cores = string.Empty;
+
+            foreach (Hardware hardwareItem in computer.Hardware)
+            {
+                hardwareItem.Update();
+                if (hardwareItem.HardwareType == HardwareType.Cpu)
+                {
+                    name =  hardwareItem.Name;
+                }
+            }
+
+            cores = computer.SMBios.Processors.ToList().LastOrDefault().CoreCount.ToString();
+            string maxFrequency = (computer.SMBios.Processors.ToList().LastOrDefault().MaxSpeed/1000.0).ToString();
+
+            return $"{name} \n" +
+                $"  Cores: {cores} \n" +
+                $"  Max frequency: {maxFrequency} GHz";
+        }
     }
 }

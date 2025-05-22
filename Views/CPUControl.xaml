@@ -11,7 +11,29 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <Grid>
-        <oxy:PlotView Model="{Binding CPUTemperaturePlot}" Visibility="{Binding TemperatureVisibility}" />
-        <oxy:PlotView Model="{Binding CPULoadPlot}" Visibility="{Binding LoadVisibility}" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Margin="40,30,30,20"
+            VerticalAlignment="Center"
+            FontSize="14"
+            Text="{Binding Characteristics}" />
+
+        <oxy:PlotView
+            Grid.Row="1"
+            Margin="5"
+            Model="{Binding CPUTemperaturePlot}"
+            Visibility="{Binding TemperatureVisibility}" />
+
+        <oxy:PlotView
+            Grid.Row="1"
+            Margin="5"
+            Model="{Binding CPULoadPlot}"
+            Visibility="{Binding LoadVisibility}" />
+
     </Grid>
 </UserControl>

@@ -10,6 +10,7 @@
     Title="HardwareTempMonitor"
     Width="800"
     Height="450"
+    FontFamily="Cascadia Code Extra"
     Icon="icon.png"
     mc:Ignorable="d">
     <Window.DataContext>

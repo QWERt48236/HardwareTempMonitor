@@ -18,6 +18,8 @@ namespace HardwareTempMonitor.ViewModels
         private PlotModel _cpuTemperature = new PlotModel();
         private PlotModel _cpuLoad = new PlotModel();
 
+        private string _characteristics = string.Empty;
+
         private DateTime startTime = DateTime.Now;
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -32,6 +34,7 @@ namespace HardwareTempMonitor.ViewModels
 
             MainMonitoringModel.OnMonitoringDataUpdate += BuildCPUTemperaturePlot;
             MainMonitoringModel.OnMonitoringDataUpdate += BuildCPULoadPlot;
+            MainMonitoringModel.OnMonitoringDataUpdate += SetCharacteristics;
 
             CPUTemperatureCommand = new RelayCommand(ShowCPUTemperature);
             CPULoadCommand = new RelayCommand(ShowCPULoad);
@@ -89,6 +92,19 @@ namespace HardwareTempMonitor.ViewModels
             }
         }
 
+        public string Characteristics
+        {
+            get
+            {
+                return _characteristics;
+            }
+            set
+            {
+                _characteristics = value;
+                OnPropertyChanged("Characteristics");
+            }
+        }
+
         public ICommand CPUTemperatureCommand { get; }
         public ICommand CPULoadCommand { get; }
 
@@ -107,6 +123,15 @@ namespace HardwareTempMonitor.ViewModels
         {
             TemperatureVisibility = Visibility.Collapsed;
             LoadVisibility = Visibility.Visible;
+        }
+
+        private void SetCharacteristics(LinkedList<MonitoringDataModel> monitoringDataModels)
+        {
+            var cpu = monitoringDataModels.Last().CPU.Characteriscs;
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                Characteristics = cpu;
+            }));
         }
 
         private void BuildCPUTemperaturePlot(LinkedList<MonitoringDataModel> monitoringDataModels)
@@ -173,6 +198,8 @@ namespace HardwareTempMonitor.ViewModels
             });
 
             CPUTemperaturePlot.Subtitle = "CPU temperature";
+            CPUTemperaturePlot.DefaultFont = "Cascadia Code Extra";
+            CPUTemperaturePlot.SubtitleFontSize = 20;
 
             CPUTemperaturePlot.Axes.Add(new DateTimeAxis
             {
@@ -181,8 +208,8 @@ namespace HardwareTempMonitor.ViewModels
                 {
                     var span = DateTimeAxis.ToDateTime(val) - startTime;
                     return span.TotalMinutes < 1
-                        ? $"+{span.Seconds}s"
-                        : $"+{span.Minutes}m {span.Seconds}s"; 
+                        ? $"{span.Seconds}s"
+                        : $"{span.Minutes}m {span.Seconds}s"; 
                 },
                 IntervalType = DateTimeIntervalType.Seconds,
                 MajorGridlineStyle = LineStyle.Solid,
@@ -190,7 +217,9 @@ namespace HardwareTempMonitor.ViewModels
                 MajorGridlineColor = OxyColors.LightGray,
                 MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
                 MajorGridlineThickness = 1,
-                MinorGridlineThickness = 0.5
+                MinorGridlineThickness = 0.5,
+                TitleFontSize = 16,
+                FontSize = 12
             });
             CPUTemperaturePlot.Axes.Add(new LinearAxis
             {
@@ -202,7 +231,9 @@ namespace HardwareTempMonitor.ViewModels
                 MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
                 MajorGridlineThickness = 1,
                 MinorGridlineThickness = 0.5,
-                Minimum = 0
+                Minimum = 0,
+                TitleFontSize = 16,
+                FontSize = 12
             });
 
             CPUTemperaturePlot.InvalidatePlot(true);
@@ -218,6 +249,8 @@ namespace HardwareTempMonitor.ViewModels
             });
 
             CPULoadPlot.Subtitle = "CPU load";
+            CPULoadPlot.DefaultFont = "Cascadia Code Extra";
+            CPULoadPlot.SubtitleFontSize = 20;
 
             CPULoadPlot.Axes.Add(new DateTimeAxis
             {
@@ -235,7 +268,9 @@ namespace HardwareTempMonitor.ViewModels
                 MajorGridlineColor = OxyColors.LightGray,
                 MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
                 MajorGridlineThickness = 1,
-                MinorGridlineThickness = 0.5
+                MinorGridlineThickness = 0.5,
+                TitleFontSize = 16,
+                FontSize = 12
             });
             CPULoadPlot.Axes.Add(new LinearAxis
             {
@@ -247,7 +282,10 @@ namespace HardwareTempMonitor.ViewModels
                 MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
                 MajorGridlineThickness = 1,
                 MinorGridlineThickness = 0.5,
-                Minimum = 0
+                Minimum = 0,
+                Maximum = 100,
+                TitleFontSize = 16,
+                FontSize = 12
             });
 
             CPULoadPlot.InvalidatePlot(true);

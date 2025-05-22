@@ -57,7 +57,8 @@ namespace HardwareTempMonitor.Models
             CPUDataModel CPUDataModel = new CPUDataModel()
             {
                 Temperature = _cpuMeasureModel.GetCPUTemperature(_computer),
-                Load = _cpuMeasureModel.GetCPULoad(_computer)
+                Load = _cpuMeasureModel.GetCPULoad(_computer),
+                Characteriscs = _cpuMeasureModel.GetCPUCharacteristics(_computer)
             };
 
             NetworkDataModel networkDataModel = new NetworkDataModel()

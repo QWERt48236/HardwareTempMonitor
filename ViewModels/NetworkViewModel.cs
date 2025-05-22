@@ -107,8 +107,8 @@ namespace HardwareTempMonitor.ViewModels
                 {
                     var span = DateTimeAxis.ToDateTime(val) - startTime;
                     return span.TotalMinutes < 1
-                        ? $"+{span.Seconds}s"
-                        : $"+{span.Minutes}m {span.Seconds}s";
+                        ? $"{span.Seconds}s"
+                        : $"{span.Minutes}m {span.Seconds}s";
                 },
                 IntervalType = DateTimeIntervalType.Seconds,
                 MajorGridlineStyle = LineStyle.Solid,

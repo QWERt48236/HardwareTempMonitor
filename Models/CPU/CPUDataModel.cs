@@ -10,5 +10,6 @@ namespace HardwareTempMonitor.Models.CPU
     {
         public float Temperature { get; set; }
         public float Load { get; set; }
+        public string Characteriscs { get; set; }
     }
 }

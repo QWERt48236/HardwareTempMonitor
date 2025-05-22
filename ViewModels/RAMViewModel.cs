@@ -77,11 +77,13 @@ namespace HardwareTempMonitor.ViewModels
             RAMLoadPlot = new PlotModel();
             RAMLoadPlot.Series.Add(new LineSeries()
             {
-                StrokeThickness = 2,
-                Color = OxyColors.Crimson
+                StrokeThickness = 3,
+                Color = OxyColors.DarkOliveGreen
             });
 
             RAMLoadPlot.Subtitle = "RAM load";
+            RAMLoadPlot.DefaultFont = "Cascadia Code Extra";
+            RAMLoadPlot.SubtitleFontSize = 20;
 
             RAMLoadPlot.Axes.Add(new DateTimeAxis
             {
@@ -99,7 +101,9 @@ namespace HardwareTempMonitor.ViewModels
                 MajorGridlineColor = OxyColors.LightGray,
                 MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
                 MajorGridlineThickness = 1,
-                MinorGridlineThickness = 0.5
+                MinorGridlineThickness = 0.5,
+                TitleFontSize = 16,
+                FontSize = 12
             });
             RAMLoadPlot.Axes.Add(new LinearAxis
             {
@@ -112,7 +116,9 @@ namespace HardwareTempMonitor.ViewModels
                 MajorGridlineThickness = 1,
                 MinorGridlineThickness = 0.5,
                 Minimum = 0,
-                Maximum = 16
+                Maximum = 16,
+                TitleFontSize = 16,
+                FontSize = 12
             });
 
             RAMLoadPlot.InvalidatePlot(true);
