@@ -99,6 +99,8 @@ namespace HardwareTempMonitor.ViewModels
             });
 
             NetworkPlot.Subtitle = "Network";
+            NetworkPlot.DefaultFont = "Cascadia Code Extra";
+            NetworkPlot.SubtitleFontSize = 20;
 
             NetworkPlot.Axes.Add(new DateTimeAxis
             {
@@ -116,7 +118,9 @@ namespace HardwareTempMonitor.ViewModels
                 MajorGridlineColor = OxyColors.LightGray,
                 MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
                 MajorGridlineThickness = 1,
-                MinorGridlineThickness = 0.5
+                MinorGridlineThickness = 0.5,
+                TitleFontSize = 16,
+                FontSize = 12
             });
             NetworkPlot.Axes.Add(new LinearAxis
             {
@@ -128,7 +132,9 @@ namespace HardwareTempMonitor.ViewModels
                 MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
                 MajorGridlineThickness = 1,
                 MinorGridlineThickness = 0.5,
-                Minimum = 0
+                Minimum = 0,
+                TitleFontSize = 16,
+                FontSize = 12
             });
             NetworkPlot.Axes.Add(new LinearAxis
             {
@@ -140,7 +146,9 @@ namespace HardwareTempMonitor.ViewModels
                 MinorGridlineColor = OxyColor.FromAColor(80, OxyColors.LightGray),
                 MajorGridlineThickness = 1,
                 MinorGridlineThickness = 0.5,
-                Minimum = 0
+                Minimum = 0,
+                TitleFontSize = 16,
+                FontSize = 12
             });
 
             NetworkPlot.InvalidatePlot(true);
