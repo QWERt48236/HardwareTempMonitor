@@ -6,11 +6,14 @@ Hardware Temp Monitor, a WPF-based utility app developed in C# to display live h
  - Network download, upload speed;
  - RAM usage;
 
-<br> <img src="https://github.com/user-attachments/assets/a10f0ee8-3745-4d41-8454-cab6f342a33c" alt="App screenshot" width="600"/> <br>
+<br> 
+
+![image](https://github.com/user-attachments/assets/1a01c2d7-66dd-4483-af5a-a8bffd329e0d)
+
+<br>
 
 ## Future features and improvements 
 
- - Hardware name and parameters display
  - Storage monitoring
  - GPU monitoring
  - Improved visuals
